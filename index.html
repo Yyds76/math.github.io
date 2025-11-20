@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>複數與幾何變換的魔法</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 210mm;
+            margin: 0 auto;
+            background: white;
+            padding: 0;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .download-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        #report {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm;
+            background: white;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+        }
+
+        .student-info {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            letter-spacing: 2px;
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 10px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .subtitle {
+            font-size: 16px;
+            margin-top: 5px;
+            opacity: 0.95;
+        }
+
+        .section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 3px solid #667eea;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title::before {
+            content: "◆";
+            margin-right: 8px;
+            font-size: 16px;
+        }
+
+        .content {
+            font-size: 15px;
+            line-height: 1.8;
+            color: #333;
+            text-align: justify;
+        }
+
+        .formula-box {
+            background: #f8f9ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .formula {
+            font-size: 18px;
+            font-weight: bold;
+            color: #764ba2;
+            text-align: center;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .example-box {
+            background: #fff8e1;
+            border: 2px solid #ffd54f;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .example-title {
+            font-weight: bold;
+            color: #f57c00;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .canvas-container {
+            text-align: center;
+            margin: 20px 0;
+            background: #fafafa;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        canvas {
+            border: 2px solid #667eea;
+            border-radius: 5px;
+            background: white;
+            max-width: 100%;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            border: 2px solid #333;
+        }
+
+        .step {
+            margin: 12px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .step::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 8px;
+        }
+
+        .control-group {
+            display: inline-block;
+            margin: 0 15px;
+        }
+
+        .control-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #667eea;
+        }
+
+        .control-group input {
+            width: 150px;
+            padding: 8px;
+            border: 2px solid #667eea;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .apply-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+
+        .apply-btn:hover {
+            background: #764ba2;
+            transform: scale(1.05);
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .download-btn, .controls {
+                display: none;
+            }
+            .container {
+                box-shadow: none;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="download-btn" onclick="downloadPDF()">📥 下載 PDF</button>
+    
+    <div class="container">
+        <div id="report">
+            <div class="header">
+                <div class="student-info">邱宗維_高三丙_8</div>
+                <div class="title">複數與幾何變換的魔法</div>
+                <div class="subtitle">探索複數乘法中的旋轉與伸縮奧秘</div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">核心原理</div>
+                <div class="content">
+                    複數可以表示為極座標形式：<span class="highlight">z = r(cos θ + i sin θ) = re^(iθ)</span>，其中 r 是模長，θ 是幅角。當兩個複數相乘時，會發生神奇的幾何變換：
+                </div>
+                
+                <div class="formula-box">
+                    <div class="formula">z₁ × z₂ = r₁e^(iθ₁) × r₂e^(iθ₂) = (r₁r₂)e^(i(θ₁+θ₂))</div>
+                    <div class="content" style="text-align: center; margin-top: 10px;">
+                        <strong>關鍵發現：</strong><br>
+                        • <span class="highlight">模長相乘</span> → 伸縮變換（r₁ × r₂）<br>
+                        • <span class="highlight">幅角相加</span> → 旋轉變換（θ₁ + θ₂）
+                    </div>
+                </div>
+
+                <div class="content">
+                    這個性質讓複數乘法成為平面變換的完美工具。乘以 e^(iθ) 會讓圖形繞原點旋轉 θ 角度；乘以實數 r 會讓圖形放大或縮小 r 倍。
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">應用展示：魔法星形變換</div>
+                
+                <div class="example-box">
+                    <div class="example-title">📐 實例：五角星的旋轉與伸縮</div>
+                    <div class="content">
+                        <div class="step"><strong>原始圖形：</strong>一個藍色五角星，各頂點為複數點</div>
+                        <div class="step"><strong>變換複數：</strong>w = 1.5 × e^(i×45°) = 1.5(cos 45° + i sin 45°)</div>
+                        <div class="step"><strong>操作：</strong>將每個頂點 z 乘以變換複數 w，得到新頂點 z' = z × w</div>
+                        <div class="step"><strong>結果：</strong>紅色五角星（放大1.5倍 + 逆時針旋轉45°）</div>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <div class="control-group">
+                        <label>縮放倍數 (r)</label>
+                        <input type="number" id="scale" value="1.5" step="0.1" min="0.5" max="3">
+                    </div>
+                    <div class="control-group">
+                        <label>旋轉角度 (°)</label>
+                        <input type="number" id="angle" value="45" step="5" min="0" max="360">
+                    </div>
+                    <br>
+                    <button class="apply-btn" onclick="applyTransform()">應用變換 ✨</button>
+                </div>
+
+                <div class="canvas-container">
+                    <canvas id="canvas" width="600" height="450"></canvas>
+                    <div class="legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #3b82f6;"></div>
+                            <span>原始圖形</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #ef4444;"></div>
+                            <span>變換後圖形</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #10b981;"></div>
+                            <span>複數點標記</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content" style="margin-top: 15px;">
+                    <strong>💡 數學計算示例：</strong><br>
+                    假設原始點 z = 2 + 0i（五角星右端點），變換複數 w = 1.5e^(i×45°) ≈ 1.06 + 1.06i<br>
+                    變換後：z' = z × w = (2)(1.06 + 1.06i) = <span class="highlight">2.12 + 2.12i</span><br>
+                    驗證：|z'| = √(2.12² + 2.12²) ≈ 3.0（模長變為1.5倍✓），arg(z') = 45°（旋轉45°✓）
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">視覺化思維導圖</div>
+                <div class="canvas-container">
+                    <canvas id="mindmap" width="600" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const mindmapCanvas = document.getElementById('mindmap');
+        const mindmapCtx = mindmapCanvas.getContext('2d');
+
+        function drawGrid() {
+            ctx.strokeStyle = '#e5e5e5';
+            ctx.lineWidth = 1;
+            
+            for (let x = 0; x <= canvas.width; x += 30) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            
+            for (let y = 0; y <= canvas.height; y += 30) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+            
+            // Draw axes
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2, 0);
+            ctx.lineTo(canvas.width / 2, canvas.height);
+            ctx.moveTo(0, canvas.height / 2);
+            ctx.lineTo(canvas.width, canvas.height / 2);
+            ctx.stroke();
+            
+            // Labels
+            ctx.fillStyle = '#666';
+            ctx.font = 'bold 14px Arial';
+            ctx.fillText('Re', canvas.width - 25, canvas.height / 2 - 10);
+            ctx.fillText('Im', canvas.width / 2 + 10, 20);
+        }
+
+        function createStar(cx, cy, outerRadius) {
+            const points = [];
+            const innerRadius = outerRadius * 0.4; // Inner radius is 40% of outer radius
+            const numPoints = 5;
+            
+            // Create alternating outer and inner points
+            for (let i = 0; i < numPoints * 2; i++) {
+                const angle = (i * Math.PI / numPoints) - Math.PI / 2; // Start from top
+                const radius = i % 2 === 0 ? outerRadius : innerRadius;
+                const x = cx + radius * Math.cos(angle);
+                const y = cy + radius * Math.sin(angle);
+                points.push({x, y});
+            }
+            
+            return points;
+        }
+
+        function drawStar(points, color, label) {
+            ctx.fillStyle = color;
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3;
+            
+            ctx.beginPath();
+            ctx.moveTo(points[0].x, points[0].y);
+            for (let i = 1; i < points.length; i++) {
+                ctx.lineTo(points[i].x, points[i].y);
+            }
+            ctx.closePath();
+            ctx.globalAlpha = 0.3;
+            ctx.fill();
+            ctx.globalAlpha = 1.0;
+            ctx.stroke();
+            
+            // Draw points
+            points.forEach((point, i) => {
+                ctx.fillStyle = '#10b981';
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, 5, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.strokeStyle = '#065f46';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            });
+        }
+
+        function transformPoint(point, scale, angleRad, centerX, centerY) {
+            // Convert to complex number relative to center
+            const x = point.x - centerX;
+            const y = centerY - point.y; // Flip y for math convention
+            
+            // Apply transformation: multiply by scale * e^(i*angle)
+            const newX = scale * (x * Math.cos(angleRad) - y * Math.sin(angleRad));
+            const newY = scale * (x * Math.sin(angleRad) + y * Math.cos(angleRad));
+            
+            return {
+                x: newX + centerX,
+                y: centerY - newY // Flip back for canvas
+            };
+        }
+
+        function applyTransform() {
+            const scale = parseFloat(document.getElementById('scale').value);
+            const angleDeg = parseFloat(document.getElementById('angle').value);
+            const angleRad = angleDeg * Math.PI / 180;
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawGrid();
+            
+            // Original star
+            const originalStar = createStar(centerX, centerY, 80);
+            drawStar(originalStar, '#3b82f6', '原始');
+            
+            // Transformed star
+            const transformedStar = originalStar.map(point => 
+                transformPoint(point, scale, angleRad, centerX, centerY)
+            );
+            drawStar(transformedStar, '#ef4444', '變換後');
+            
+            // Draw transformation info
+            ctx.fillStyle = '#000';
+            ctx.font = 'bold 14px Microsoft JhengHei';
+            ctx.fillText(`變換: ${scale} × e^(i×${angleDeg}°)`, 10, 25);
+            ctx.fillText(`模長放大: ×${scale}  |  旋轉: ${angleDeg}°`, 10, 45);
+        }
+
+        function drawMindmap() {
+            const ctx = mindmapCtx;
+            const width = mindmapCanvas.width;
+            const height = mindmapCanvas.height;
+            
+            ctx.clearRect(0, 0, width, height);
+            
+            // Center node
+            ctx.fillStyle = '#667eea';
+            ctx.beginPath();
+            ctx.arc(width/2, height/2, 40, 0, 2*Math.PI);
+            ctx.fill();
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 14px Microsoft JhengHei';
+            ctx.textAlign = 'center';
+            ctx.fillText('複數乘法', width/2, height/2);
+            
+            // Left branch - Rotation
+            ctx.strokeStyle = '#667eea';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(width/2 - 40, height/2);
+            ctx.lineTo(150, height/2);
+            ctx.stroke();
+            
+            ctx.fillStyle = '#10b981';
+            ctx.beginPath();
+            ctx.arc(150, height/2, 35, 0, 2*Math.PI);
+            ctx.fill();
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 13px Microsoft JhengHei';
+            ctx.fillText('旋轉', 150, height/2 - 5);
+            ctx.font = '11px Microsoft JhengHei';
+            ctx.fillText('幅角相加', 150, height/2 + 10);
+            
+            // Right branch - Scaling
+            ctx.strokeStyle = '#667eea';
+            ctx.beginPath();
+            ctx.moveTo(width/2 + 40, height/2);
+            ctx.lineTo(width - 150, height/2);
+            ctx.stroke();
+            
+            ctx.fillStyle = '#f59e0b';
+            ctx.beginPath();
+            ctx.arc(width - 150, height/2, 35, 0, 2*Math.PI);
+            ctx.fill();
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 13px Microsoft JhengHei';
+            ctx.fillText('伸縮', width - 150, height/2 - 5);
+            ctx.font = '11px Microsoft JhengHei';
+            ctx.fillText('模長相乘', width - 150, height/2 + 10);
+            
+            // Top branch - Formula
+            ctx.strokeStyle = '#667eea';
+            ctx.beginPath();
+            ctx.moveTo(width/2, height/2 - 40);
+            ctx.lineTo(width/2, 50);
+            ctx.stroke();
+            
+            ctx.fillStyle = '#ef4444';
+            ctx.fillRect(width/2 - 80, 30, 160, 40);
+            ctx.fillStyle = 'white';
+            ctx.font = '12px Courier New';
+            ctx.fillText('re^(iθ)', width/2, 50);
+            ctx.font = '10px Microsoft JhengHei';
+            ctx.fillText('極座標形式', width/2, 65);
+        }
+
+        function downloadPDF() {
+            const element = document.getElementById('report');
+            const opt = {
+                margin: 0,
+                filename: '複數與幾何變換_邱宗維.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            
+            html2pdf().set(opt).from(element).save();
+        }
+
+        // Initialize
+        applyTransform();
+        drawMindmap();
+    </script>
+</body>
+</html>
