@@ -280,20 +280,25 @@
             <div class="section">
                 <div class="section-title">核心原理</div>
                 <div class="content">
-                    複數可以表示為極座標形式：<span class="highlight">z = r(cos θ + i sin θ) = re^(iθ)</span>，其中 r 是模長，θ 是幅角。當兩個複數相乘時，會發生神奇的幾何變換：
+                    複數不僅是代數數，更是幾何操作的語言。根據<strong>歐拉公式 (Euler's Formula)</strong> <span class="highlight">e^(iθ) = cos θ + i sin θ</span>，我們可以將複數表示為極座標形式：z = r(cos θ + i sin θ)。
+                    <br><br>
+                    當兩個複數 z₁ = r₁e^(iθ₁) 與 z₂ = r₂e^(iθ₂) 相乘時：
                 </div>
                 
                 <div class="formula-box">
-                    <div class="formula">z₁ × z₂ = r₁e^(iθ₁) × r₂e^(iθ₂) = (r₁r₂)e^(i(θ₁+θ₂))</div>
+                    <div class="formula">z₁ · z₂ = (r₁e^(iθ₁)) · (r₂e^(iθ₂)) = (r₁r₂) · e^(i(θ₁+θ₂))</div>
                     <div class="content" style="text-align: center; margin-top: 10px;">
-                        <strong>關鍵發現：</strong><br>
-                        • <span class="highlight">模長相乘</span> → 伸縮變換（r₁ × r₂）<br>
-                        • <span class="highlight">幅角相加</span> → 旋轉變換（θ₁ + θ₂）
+                        <strong>幾何意義解析：</strong><br>
+                        1. <span class="highlight">伸縮 (Scaling)</span>：新模長為原模長之積 (|z'| = |z₁| · |z₂|)<br>
+                        2. <span class="highlight">旋轉 (Rotation)</span>：新幅角為原幅角之和 (arg(z') = arg(z₁) + arg(z₂))
                     </div>
                 </div>
 
                 <div class="content">
-                    這個性質讓複數乘法成為平面變換的完美工具。乘以 e^(iθ) 會讓圖形繞原點旋轉 θ 角度；乘以實數 r 會讓圖形放大或縮小 r 倍。
+                    <strong>為什麼會旋轉？</strong><br>
+                    若將旋轉算子 w = cos θ + i sin θ 乘上任意複數 z = x + iy：<br>
+                    w · z = (x cos θ - y sin θ) + i(x sin θ + y cos θ)<br>
+                    這正是線性代數中的<strong>旋轉矩陣</strong>運算結果，完美連結了代數運算與幾何變換。
                 </div>
             </div>
 
@@ -303,10 +308,10 @@
                 <div class="example-box">
                     <div class="example-title">📐 實例：五角星的旋轉與伸縮</div>
                     <div class="content">
-                        <div class="step"><strong>原始圖形：</strong>一個藍色五角星，各頂點為複數點</div>
-                        <div class="step"><strong>變換複數：</strong>w = 1.5 × e^(i×45°) = 1.5(cos 45° + i sin 45°)</div>
-                        <div class="step"><strong>操作：</strong>將每個頂點 z 乘以變換複數 w，得到新頂點 z' = z × w</div>
-                        <div class="step"><strong>結果：</strong>紅色五角星（放大1.5倍 + 逆時針旋轉45°）</div>
+                        <div class="step"><strong>原始圖形：</strong>定義五角星的頂點為複數平面上的點集 P = {z₁, z₂, ..., z₁₀}。</div>
+                        <div class="step"><strong>變換算子：</strong>設定變換複數 w = 1.5(cos 45° + i sin 45°)，代表放大 1.5 倍並逆時針旋轉 45°。</div>
+                        <div class="step"><strong>運算過程：</strong>對每個頂點 zₖ 執行複數乘法 P' = {zₖ · w}。</div>
+                        <div class="step"><strong>結果驗證：</strong>新圖形保持五角星形狀，但整體發生了幾何變換。</div>
                     </div>
                 </div>
 
@@ -342,10 +347,17 @@
                 </div>
 
                 <div class="content" style="margin-top: 15px;">
-                    <strong>💡 數學計算示例：</strong><br>
-                    假設原始點 z = 2 + 0i（五角星右端點），變換複數 w = 1.5e^(i×45°) ≈ 1.06 + 1.06i<br>
-                    變換後：z' = z × w = (2)(1.06 + 1.06i) = <span class="highlight">2.12 + 2.12i</span><br>
-                    驗證：|z'| = √(2.12² + 2.12²) ≈ 3.0（模長變為1.5倍✓），arg(z') = 45°（旋轉45°✓）
+                    <strong>💡 詳細數學運算示例：</strong><br>
+                    取五角星右側頂點 z = 2 + 0i，變換算子 w = 1.5(cos 45° + i sin 45°) ≈ 1.06 + 1.06i<br>
+                    <div style="background: #f0f4f8; padding: 10px; border-radius: 5px; margin-top: 5px; font-family: monospace;">
+                        z' = z · w <br>
+                           = (2)(1.06 + 1.06i)<br>
+                           = 2(1.06) + 2(1.06i)<br>
+                           = 2.12 + 2.12i
+                    </div>
+                    <strong>幾何驗證：</strong><br>
+                    • 模長：|z'| = √(2.12² + 2.12²) ≈ 3.0 (原長 2 × 1.5 = 3.0) <span style="color:green">✔ 符合</span><br>
+                    • 角度：tan(φ) = 2.12/2.12 = 1 ⇒ φ = 45° (原角 0° + 45° = 45°) <span style="color:green">✔ 符合</span>
                 </div>
             </div>
 
@@ -479,6 +491,25 @@
                 transformPoint(point, scale, angleRad, centerX, centerY)
             );
             drawStar(transformedStar, '#ef4444', '變換後');
+
+            if (angleDeg !== 0) {
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, 40, -Math.PI/2, -Math.PI/2 - angleRad, true); // Draw arc from top (-90deg)
+                ctx.strokeStyle = '#f59e0b';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                // Arrow head
+                const endAngle = -Math.PI/2 - angleRad;
+                const arrowX = centerX + 40 * Math.cos(endAngle);
+                const arrowY = centerY + 40 * Math.sin(endAngle);
+                ctx.beginPath();
+                ctx.arc(arrowX, arrowY, 4, 0, Math.PI*2);
+                ctx.fillStyle = '#f59e0b';
+                ctx.fill();
+            }
             
             // Draw transformation info
             ctx.fillStyle = '#000';
@@ -497,62 +528,76 @@
             // Center node
             ctx.fillStyle = '#667eea';
             ctx.beginPath();
-            ctx.arc(width/2, height/2, 40, 0, 2*Math.PI);
+            ctx.arc(width/2, height/2, 45, 0, 2*Math.PI); // Slightly larger
             ctx.fill();
             ctx.fillStyle = 'white';
             ctx.font = 'bold 14px Microsoft JhengHei';
             ctx.textAlign = 'center';
-            ctx.fillText('複數乘法', width/2, height/2);
+            ctx.fillText('複數幾何變換', width/2, height/2); // Updated text
             
             // Left branch - Rotation
             ctx.strokeStyle = '#667eea';
             ctx.lineWidth = 3;
             ctx.beginPath();
-            ctx.moveTo(width/2 - 40, height/2);
-            ctx.lineTo(150, height/2);
+            ctx.moveTo(width/2 - 45, height/2);
+            ctx.lineTo(120, height/2);
             ctx.stroke();
             
             ctx.fillStyle = '#10b981';
             ctx.beginPath();
-            ctx.arc(150, height/2, 35, 0, 2*Math.PI);
+            ctx.arc(120, height/2, 40, 0, 2*Math.PI);
             ctx.fill();
             ctx.fillStyle = 'white';
             ctx.font = 'bold 13px Microsoft JhengHei';
-            ctx.fillText('旋轉', 150, height/2 - 5);
+            ctx.fillText('旋轉 (Rotation)', 120, height/2 - 8);
             ctx.font = '11px Microsoft JhengHei';
-            ctx.fillText('幅角相加', 150, height/2 + 10);
+            ctx.fillText('幅角相加 θ₁+θ₂', 120, height/2 + 10);
             
             // Right branch - Scaling
             ctx.strokeStyle = '#667eea';
             ctx.beginPath();
-            ctx.moveTo(width/2 + 40, height/2);
-            ctx.lineTo(width - 150, height/2);
+            ctx.moveTo(width/2 + 45, height/2);
+            ctx.lineTo(width - 120, height/2);
             ctx.stroke();
             
             ctx.fillStyle = '#f59e0b';
             ctx.beginPath();
-            ctx.arc(width - 150, height/2, 35, 0, 2*Math.PI);
+            ctx.arc(width - 120, height/2, 40, 0, 2*Math.PI);
             ctx.fill();
             ctx.fillStyle = 'white';
             ctx.font = 'bold 13px Microsoft JhengHei';
-            ctx.fillText('伸縮', width - 150, height/2 - 5);
+            ctx.fillText('伸縮 (Scaling)', width - 120, height/2 - 8);
             ctx.font = '11px Microsoft JhengHei';
-            ctx.fillText('模長相乘', width - 150, height/2 + 10);
+            ctx.fillText('模長相乘 r₁×r₂', width - 120, height/2 + 10);
             
             // Top branch - Formula
             ctx.strokeStyle = '#667eea';
             ctx.beginPath();
-            ctx.moveTo(width/2, height/2 - 40);
-            ctx.lineTo(width/2, 50);
+            ctx.moveTo(width/2, height/2 - 45);
+            ctx.lineTo(width/2, 40);
             ctx.stroke();
             
             ctx.fillStyle = '#ef4444';
-            ctx.fillRect(width/2 - 80, 30, 160, 40);
+            ctx.fillRect(width/2 - 90, 20, 180, 45);
             ctx.fillStyle = 'white';
             ctx.font = '12px Courier New';
-            ctx.fillText('re^(iθ)', width/2, 50);
+            ctx.fillText('z\' = z · (re^(iθ))', width/2, 40);
             ctx.font = '10px Microsoft JhengHei';
-            ctx.fillText('極座標形式', width/2, 65);
+            ctx.fillText('歐拉公式應用', width/2, 55);
+
+            ctx.strokeStyle = '#667eea';
+            ctx.beginPath();
+            ctx.moveTo(width/2, height/2 + 45);
+            ctx.lineTo(width/2, height - 40);
+            ctx.stroke();
+
+            ctx.fillStyle = '#8b5cf6';
+            ctx.fillRect(width/2 - 70, height - 60, 140, 40);
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 12px Microsoft JhengHei';
+            ctx.fillText('矩陣聯繫', width/2, height - 40);
+            ctx.font = '10px Microsoft JhengHei';
+            ctx.fillText('對應旋轉矩陣', width/2, height - 25);
         }
 
         function downloadPDF() {
